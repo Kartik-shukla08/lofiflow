@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Lofi Flow</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+      tailwind.config = {
+        theme: {
+          extend: {
+            colors: {
+              nord: {
+                bg: '#2e3440',
+                accent: '#88c0d0',
+              },
+              tokyo: {
+                bg: '#1a1b26',
+                accent: '#7aa2f7',
+              },
+              gruvbox: {
+                bg: '#282828',
+                accent: '#fe8019',
+              }
+            },
+            animation: {
+              'spin-slow': 'spin 8s linear infinite',
+              'pulse-slow': 'pulse 4s cubic-bezier(0.4, 0, 0.6, 1) infinite',
+            }
+          }
+        }
+      }
+    </script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <style>
+      body { font-family: 'Inter', sans-serif; }
+      .font-mono { font-family: 'JetBrains Mono', monospace; }
+      
+      /* Custom Scrollbar */
+      ::-webkit-scrollbar {
+        width: 6px;
+        height: 6px;
+      }
+      ::-webkit-scrollbar-track {
+        background: transparent; 
+      }
+      ::-webkit-scrollbar-thumb {
+        background: rgba(255, 255, 255, 0.2); 
+        border-radius: 10px;
+      }
+      ::-webkit-scrollbar-thumb:hover {
+        background: rgba(255, 255, 255, 0.3); 
+      }
+    </style>
+  <script type="importmap">
+{
+  "imports": {
+    "react": "https://esm.sh/react@18.2.0",
+    "react/": "https://esm.sh/react@18.2.0/",
+    "react-dom": "https://esm.sh/react-dom@18.2.0",
+    "react-dom/client": "https://esm.sh/react-dom@18.2.0/client",
+    "framer-motion": "https://esm.sh/framer-motion@10.16.16?external=react,react-dom",
+    "lucide-react": "https://esm.sh/lucide-react@0.303.0?external=react,react-dom",
+    "zustand": "https://esm.sh/zustand@4.4.7?external=react",
+    "zustand/middleware": "https://esm.sh/zustand@4.4.7/middleware?external=react",
+    "nanoid": "https://esm.sh/nanoid@5.0.4",
+    "react-player": "https://esm.sh/react-player@2.14.1?external=react,react-dom",
+    "firebase/app": "https://esm.sh/firebase@10.7.1/app",
+    "firebase/auth": "https://esm.sh/firebase@10.7.1/auth",
+    "firebase/firestore": "https://esm.sh/firebase@10.7.1/firestore",
+    "firebase/database": "https://esm.sh/firebase@10.7.1/database",
+    "react-dom/": "https://esm.sh/react-dom@^19.2.3/",
+    "zustand/": "https://esm.sh/zustand@^5.0.9/",
+    "firebase/": "https://esm.sh/firebase@^12.7.0/",
+    "react-player/": "https://esm.sh/react-player@^3.4.0/"
+  }
+}
+</script>
+<link rel="stylesheet" href="/index.css">
+</head>
+  <body>
+    <div id="root"></div>
+    <script type="module" src="/index.tsx"></script>
+</body>
+</html>

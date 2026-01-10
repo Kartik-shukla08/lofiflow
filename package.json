@@ -1,0 +1,37 @@
+{
+  "name": "lofi-flow---study-&-relax",
+  "private": true,
+  "version": "0.0.0",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview",
+    "emulators": "firebase emulators:start --only auth,firestore,database,hosting",
+    "deploy:firebase": "firebase deploy --only hosting",
+    "seed:firebase": "node scripts/seed-firebase.cjs"
+  },
+  "dependencies": {
+    "@ionic/core": "^8.7.16",
+    "@ionic/react": "^8.7.16",
+    "firebase": "^12.7.0",
+    "framer-motion": "^10.18.0",
+    "ionicons": "^8.0.13",
+    "lottie-web": "^5.13.0",
+    "lucide-react": "0.303.0",
+    "nanoid": "5.0.4",
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0",
+    "react-player": "^3.4.0",
+    "react-youtube-music-player": "^1.0.5",
+    "zustand": "^5.0.9"
+  },
+  "devDependencies": {
+    "@types/node": "^22.14.0",
+    "@vitejs/plugin-react": "^5.0.0",
+    "firebase-admin": "^12.0.0",
+    "firebase-tools": "^11.23.0",
+    "typescript": "~5.8.2",
+    "vite": "^6.2.0"
+  }
+}
