@@ -1,0 +1,3 @@
+User-agent: *
+Allow: /
+Sitemap: https://focus-flo.vercel.app/sitemap.xml

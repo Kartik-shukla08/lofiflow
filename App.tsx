@@ -5,6 +5,7 @@ import PomodoroTimer from './components/PomodoroTimer';
 import TodoList from './components/TodoList';
 import ChatRoom from './components/ChatRoom';
 import MusicSearch from './components/MusicSearch';
+import { Helmet } from 'react-helmet-async';
 import { 
   LayoutGrid, CheckSquare, MessageCircle, Search,
   Maximize2, Minimize2, Palette, Image as ImageIcon, PlusCircle
@@ -37,6 +38,26 @@ const App: React.FC = () => {
   return (
     <div className="relative min-h-screen w-full overflow-hidden transition-colors duration-500" style={{ backgroundColor: currentTheme.colors.bg, color: currentTheme.colors.text }}>
       
+      {/* SEO HEAD SECTION */}
+        <Helmet>
+        {/* 1. Basic Title & Description */}
+        <title>Focus Flow - Lofi Music & Pomodoro Study Timer</title>
+        <meta name="description" content="Boost your study productivity with Focus Flow. Free Lofi music player, customizable Pomodoro timer, and aesthetic backgrounds for deep work." />
+        <meta name="keywords" content="lofi player, pomodoro timer, study music, focus app, productivity timer, study with me, lofi girl alternative" />
+        
+        {/* 2. Open Graph (For Discord, Twitter, WhatsApp Previews) */}
+        <meta property="og:type" content="website" />
+        <meta property="og:title" content="Focus Flow - Ultimate Study Companion" />
+        <meta property="og:description" content="Listen to Lofi, track time, and focus better. Join study rooms now." />
+        <meta property="og:image" content="https://focusflow.vercel.app/og-image.png" /> {/* We will add this image next */}
+        <meta property="og:url" content="https://focusflow.vercel.app/" /> {/* CHANGE THIS to your actual Vercel link */}
+        
+        {/* 3. Twitter Card */}
+        <meta name="twitter:card" content="summary_large_image" />
+        <meta name="twitter:title" content="Focus Flow - Lofi & Focus" />
+        <meta name="twitter:description" content="Your aesthetic study space." />
+        <meta name="twitter:image" content="https://focusflow.vercel.app/og-image.png" />
+        </Helmet>
       {/* Background Layer */}
       <div className="absolute inset-0 z-0">
         {backgroundUrl && (backgroundType === 'video' ? (
