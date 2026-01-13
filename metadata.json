@@ -1,6 +1,6 @@
 {
-  "name": "Lofi Flow - Study & Relax",
-  "description": "A distraction-free digital study space combining lofi music streaming, productivity tools, and social features.",
+  "name": "Focus Flow - Study & Relax",
+  "description": "A distraction-free digital study space combining music streaming, productivity tools, and social features.",
   "requestFramePermissions": [
     "microphone"
   ]

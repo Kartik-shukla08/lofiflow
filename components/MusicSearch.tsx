@@ -1,65 +1,103 @@
-import React, { useState, useEffect } from 'react';
-import { useUIStore } from '../store'; // Assuming you have this
-import { usePlayerStore } from '../store'; // The store we just made
-import { Play, Plus, Link as LinkIcon, Youtube, CheckCircle } from 'lucide-react';
-import { extractVideoId } from '../constants';
-import SearchModal from './SearchModal';
+import React, { useState } from 'react';
+import { useUIStore } from '../store';
+import { usePlayerStore } from '../store';
+import { Play, Plus, Search, Loader2, Music, AlertCircle, ServerCrash } from 'lucide-react';
+import { extractVideoId, API_PROVIDERS } from '../constants';
+
+interface APIVideo {
+  title: string;
+  author: string;
+  videoId: string;
+  videoThumbnails?: { url: string; width: number }[];
+}
 
 const MusicSearch: React.FC = () => {
   const { currentTheme } = useUIStore();
   const { playTrack, addToQueue } = usePlayerStore();
-  
-  const [url, setUrl] = useState('');
-  const [title, setTitle] = useState('');
+
+  const [query, setQuery] = useState('');
+  const [isSearching, setIsSearching] = useState(false);
+  const [searchResults, setSearchResults] = useState<APIVideo[]>([]);
   const [error, setError] = useState('');
-  const [previewId, setPreviewId] = useState<string | null>(null);
-  const [successMsg, setSuccessMsg] = useState('');
+  const [feedbackMsg, setFeedbackMsg] = useState('');
+  const [currentProvider, setCurrentProvider] = useState('');
 
   const cardColor = currentTheme?.colors?.card || 'rgba(30, 41, 59, 0.8)';
   const textColor = currentTheme?.colors?.text || '#fff';
 
-  // Auto-generate preview when URL changes
-  useEffect(() => {
-    const id = extractVideoId(url);
-    if (id) {
-        setPreviewId(id);
-        setError('');
-    } else {
-        setPreviewId(null);
+  // --- 1. ROBUST FETCHING LOGIC ---
+  const fetchFromProviders = async (endpoint: string) => {
+    for (const provider of API_PROVIDERS) {
+      try {
+        console.log(`Trying provider: ${provider}...`);
+        const res = await fetch(`${provider}${endpoint}`);
+        if (!res.ok) throw new Error(`Status ${res.status}`);
+        const data = await res.json();
+        setCurrentProvider(provider);
+        return data;
+      } catch (err) {
+        console.warn(`Provider ${provider} failed, trying next...`);
+      }
     }
-  }, [url]);
+    throw new Error('All providers failed');
+  };
 
-  const handleAction = (action: 'play' | 'queue') => {
+  const handleSearch = async () => {
+    if (!query.trim()) return;
+    setIsSearching(true);
     setError('');
-    setSuccessMsg('');
-    
-    if (!url.trim() || !previewId) {
-        setError('Please enter a valid YouTube URL');
-        return;
-    }
+    setSearchResults([]);
+    setCurrentProvider('');
 
-    const trackTitle = title.trim() || 'Custom Track';
-    const track = {
-        title: trackTitle,
-        url: url.trim(),
-        channel: 'User Added'
+    const directId = extractVideoId(query);
+    
+    try {
+      if (directId) {
+        // CASE A: Direct Link
+        const data = await fetchFromProviders(`/videos/${directId}`);
+        setSearchResults([{
+          title: data.title,
+          author: data.author,
+          videoId: data.videoId,
+          videoThumbnails: data.videoThumbnails
+        }]);
+      } else {
+        // CASE B: Search
+        const data = await fetchFromProviders(`/search?q=${encodeURIComponent(query)}&type=video`);
+        const videos = data.map((item: any) => ({
+            title: item.title,
+            author: item.author,
+            videoId: item.videoId,
+            videoThumbnails: item.videoThumbnails
+        })).slice(0, 10);
+        setSearchResults(videos);
+      }
+    } catch (err) {
+      setError('All servers are busy. Please try again in a moment.');
+    } finally {
+      setIsSearching(false);
+    }
+  };
+
+  // --- 2. FIXED PLAY/QUEUE LOGIC ---
+  const onSelectTrack = (video: APIVideo, action: 'play' | 'queue') => {
+    const trackPayload = {
+        title: video.title,
+        channel: video.author,
+        // CHANGE THIS LINE:
+        // Old: url: `https://youtube.com/watch?v=${video.videoId}`
+        // New: Send just the ID. The store handles this perfectly.
+        url: video.videoId 
     };
 
     if (action === 'play') {
-        playTrack(track);
-        setSuccessMsg('Playing now...');
+        playTrack(trackPayload);
+        setFeedbackMsg(`Playing: ${video.title.substring(0, 20)}...`);
     } else {
-        addToQueue(track);
-        setSuccessMsg('Added to queue!');
+        addToQueue(trackPayload);
+        setFeedbackMsg('Added to queue');
     }
-
-    // Clear form after delay
-    setTimeout(() => {
-        setUrl('');
-        setTitle('');
-        setPreviewId(null);
-        setSuccessMsg('');
-    }, 1500);
+    setTimeout(() => setFeedbackMsg(''), 2000);
   };
 
   return (
@@ -67,92 +105,96 @@ const MusicSearch: React.FC = () => {
         className="h-full w-full flex flex-col rounded-2xl overflow-hidden backdrop-blur-md border border-white/10"
         style={{ backgroundColor: cardColor, color: textColor }}
     >
-        <div className="p-4 border-b border-white/10 bg-white/5 flex items-center gap-2">
-            <Youtube className="text-red-500" size={20} />
-            <h2 className="text-lg font-semibold">Add Music</h2>
+        {/* Header */}
+        <div className="p-4 border-b border-white/10 bg-white/5 flex items-center justify-between">
+            <div className="flex items-center gap-2">
+                <Search className="opacity-70" size={20} />
+                <h2 className="text-lg font-semibold">Discover</h2>
+            </div>
+            {currentProvider && (
+               <span className="text-[10px] opacity-40 uppercase tracking-widest border border-white/20 px-2 py-0.5 rounded-full">
+                  via {currentProvider.replace('/api', 'Node ')}
+               </span>
+            )}
         </div>
 
-        <div className="p-6 flex flex-col gap-5 overflow-y-auto">
-            
-            {/* --- INPUT SECTION --- */}
-            <div className="space-y-4">
-                <div>
-                    <label className="text-xs uppercase font-bold opacity-60 mb-2 block">YouTube URL</label>
-                    <div className="relative">
-                        <input 
-                            type="text" 
-                            value={url}
-                            onChange={(e) => setUrl(e.target.value)}
-                            placeholder="Paste link here..."
-                            className="w-full bg-white/10 border-none rounded-lg py-3 pl-10 pr-4 text-sm focus:ring-1 focus:ring-white/30 placeholder-white/30 transition-all"
-                        />
-                        <LinkIcon size={16} className="absolute left-3 top-1/2 -translate-y-1/2 opacity-50" />
-                    </div>
-                </div>
-
-                <div>
-                    <label className="text-xs uppercase font-bold opacity-60 mb-2 block">Track Title (Optional)</label>
-                    <input 
-                        type="text" 
-                        value={title}
-                        onChange={(e) => setTitle(e.target.value)}
-                        placeholder="e.g. My Study Jam"
-                        className="w-full bg-white/10 border-none rounded-lg py-3 px-4 text-sm focus:ring-1 focus:ring-white/30 placeholder-white/30"
-                    />
-                </div>
+        {/* Input Area */}
+        <div className="p-4 bg-white/5 space-y-3 z-10 shadow-sm">
+            <div className="relative flex items-center gap-2">
+                <input 
+                    type="text" 
+                    value={query}
+                    onChange={(e) => setQuery(e.target.value)}
+                    onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
+                    placeholder="Search song or paste URL..."
+                    className="flex-1 bg-black/20 border border-white/10 rounded-xl py-3 pl-4 pr-10 text-sm focus:outline-none focus:ring-1 focus:ring-white/30 transition-all placeholder-white/30"
+                />
+                <button 
+                    onClick={handleSearch}
+                    disabled={isSearching || !query}
+                    className="bg-white/10 hover:bg-white/20 p-3 rounded-xl transition disabled:opacity-50"
+                >
+                    {isSearching ? <Loader2 size={18} className="animate-spin" /> : <Search size={18} />}
+                </button>
             </div>
+            
+            {/* Feedback & Errors */}
+            {feedbackMsg && (
+                <div className="text-xs text-green-300 flex items-center gap-1 animate-pulse">
+                    <Music size={12} /> {feedbackMsg}
+                </div>
+            )}
+            {error && (
+                <div className="text-xs text-red-300 flex items-center gap-1">
+                    <ServerCrash size={12} /> {error}
+                </div>
+            )}
+        </div>
 
-            {/* --- PREVIEW SECTION (New!) --- */}
-            {previewId && (
-                <div className="relative w-full aspect-video rounded-lg overflow-hidden border border-white/10 shadow-lg group">
-                    <img 
-                        src={`https://img.youtube.com/vi/${previewId}/mqdefault.jpg`} 
-                        alt="Preview" 
-                        className="w-full h-full object-cover opacity-80 group-hover:opacity-100 transition"
-                    />
-                    <div className="absolute inset-0 flex items-center justify-center">
-                        <div className="w-10 h-10 bg-black/50 rounded-full flex items-center justify-center backdrop-blur-sm">
-                            <Play size={16} fill="white" />
+        {/* Results List */}
+        <div className="flex-1 overflow-y-auto p-4 space-y-3 scrollbar-thin scrollbar-thumb-white/10">
+            {searchResults.length === 0 && !isSearching && (
+                <div className="h-full flex flex-col items-center justify-center text-center opacity-40 space-y-2">
+                    <Music size={40} />
+                    <p className="text-sm">Search for lofi, jazz, or paste a link.</p>
+                </div>
+            )}
+
+            {searchResults.map((video) => (
+                <div 
+                    key={video.videoId} 
+                    className="group flex gap-3 p-2 rounded-xl hover:bg-white/5 border border-transparent hover:border-white/10 transition-all"
+                >
+                    <div className="relative w-24 h-16 rounded-lg overflow-hidden flex-shrink-0 bg-black/30">
+                        <img 
+                            src={`https://img.youtube.com/vi/${video.videoId}/mqdefault.jpg`}
+                            alt={video.title}
+                            className="w-full h-full object-cover opacity-80 group-hover:opacity-100 transition"
+                        />
+                    </div>
+                    <div className="flex-1 flex flex-col justify-center min-w-0">
+                        <h4 className="font-medium text-sm truncate pr-2" title={video.title}>
+                            {video.title}
+                        </h4>
+                        <p className="text-xs opacity-50 truncate">{video.author}</p>
+                        
+                        <div className="flex gap-2 mt-2 opacity-0 group-hover:opacity-100 transition-opacity translate-y-2 group-hover:translate-y-0 duration-200">
+                            {/* <button 
+                                onClick={() => onSelectTrack(video, 'play')}
+                                className="flex items-center gap-1 text-[10px] bg-white text-black px-2 py-1 rounded-md font-bold hover:scale-105"
+                            >
+                                <Play size={10} fill="currentColor" /> PLAY
+                            </button> */}
+                            <button 
+                                onClick={() => onSelectTrack(video, 'queue')}
+                                className="flex items-center gap-1 text-[10px] bg-white/10 px-2 py-1 rounded-md font-medium hover:bg-white/20"
+                            >
+                                <Plus size={10} /> QUEUE
+                            </button>
                         </div>
                     </div>
-                    <div className="absolute bottom-0 left-0 right-0 bg-black/60 p-2 text-xs truncate">
-                        Detected Video ID: {previewId}
-                    </div>
                 </div>
-            )}
-
-            {/* --- FEEDBACK MESSAGES --- */}
-            {error && (
-                <div className="bg-red-500/10 border border-red-500/20 text-red-200 text-xs p-3 rounded-lg animate-in fade-in slide-in-from-top-1">
-                    {error}
-                </div>
-            )}
-            
-            {successMsg && (
-                 <div className="bg-green-500/10 border border-green-500/20 text-green-200 text-xs p-3 rounded-lg flex items-center gap-2 animate-in fade-in slide-in-from-top-1">
-                    <CheckCircle size={14} /> {successMsg}
-                </div>
-            )}
-
-            {/* --- BUTTONS --- */}
-            <div className="grid grid-cols-2 gap-4 mt-auto">
-                <button 
-                    onClick={() => handleAction('queue')}
-                    disabled={!previewId}
-                    className="flex items-center justify-center gap-2 bg-white/10 hover:bg-white/20 disabled:opacity-50 disabled:cursor-not-allowed py-3 rounded-xl transition font-medium text-sm"
-                >
-                    <Plus size={18} />
-                    Queue
-                </button>
-                <button 
-                    onClick={() => handleAction('play')}
-                    disabled={!previewId}
-                    className="flex items-center justify-center gap-2 bg-white text-black hover:scale-105 active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed disabled:scale-100 py-3 rounded-xl transition font-bold text-sm shadow-lg"
-                >
-                    <Play size={18} fill="currentColor" />
-                    Play
-                </button>
-            </div>
+            ))}
         </div>
     </div>
   );

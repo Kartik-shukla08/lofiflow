@@ -39,7 +39,7 @@ const App: React.FC = () => {
       
       {/* Background Layer */}
       <div className="absolute inset-0 z-0">
-        {backgroundType === 'video' ? (
+        {backgroundUrl && (backgroundType === 'video' ? (
           <video 
             src={backgroundUrl} 
             autoPlay 
@@ -54,7 +54,7 @@ const App: React.FC = () => {
             alt="background" 
             className="w-full h-full object-cover opacity-60 transition-opacity duration-1000"
           />
-        )}
+        ))}
         <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-black/40 mix-blend-multiply pointer-events-none" />
       </div>
 
@@ -64,7 +64,7 @@ const App: React.FC = () => {
         {/* Top Bar */}
         <div className="flex justify-between items-start mb-6">
             <div className="flex flex-col">
-                <h1 className="text-3xl font-bold tracking-tight text-white/90 drop-shadow-md">Lofi Flow</h1>
+                <h1 className="text-3xl font-bold tracking-tight text-white/90 drop-shadow-md">Focus Flow</h1>
                 <p className="text-sm text-white/60 font-mono mt-1">Focus • Relax • Study</p>
             </div>
 
@@ -81,9 +81,13 @@ const App: React.FC = () => {
         {/* Dynamic Grid Layout */}
         <div className="flex-1 grid grid-cols-1 lg:grid-cols-12 gap-6 min-h-0">
             
-            {/* Center Stage: Timer (Always visible if active, or just central placeholder) */}
+            {/* Center Stage: Timer */}
             <div className="lg:col-span-4 lg:col-start-5 flex flex-col justify-center items-center">
-                 {activePanels.timer && <PomodoroTimer />}
+                <AnimatePresence mode="wait" initial={false}>
+                    {activePanels.timer && (
+                        <PomodoroTimer key="timer" />
+                    )}
+                </AnimatePresence>
             </div>
 
             {/* Right Panel: Chat, Todo, or Search */}

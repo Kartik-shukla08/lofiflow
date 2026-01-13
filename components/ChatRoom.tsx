@@ -291,7 +291,7 @@ const ChatRoom: React.FC = () => {
             </div>
             
             <div className="space-y-2">
-                <h2 className="text-2xl font-bold tracking-tight">Lofi Chat</h2>
+                <h2 className="text-2xl font-bold tracking-tight">Chat Rooms</h2>
                 <p className="text-sm max-w-[240px] mx-auto opacity-70">
                     Create a private room or join friends to vibe together.
                 </p>

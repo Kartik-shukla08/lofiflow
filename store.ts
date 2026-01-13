@@ -141,6 +141,75 @@ export const usePlayerStore = create<PlayerState>((set, get) => ({
   setIndex: (index) => set({ currentIndex: index }),
 }));
 
+// // --- Productivity Store ---
+// interface ProductivityState {
+//   // Timer
+//   timerMode: TimerMode;
+//   timeLeft: number;
+//   timerActive: boolean;
+//   setTimerMode: (mode: TimerMode) => void;
+//   toggleTimer: () => void;
+//   resetTimer: () => void;
+//   tick: () => void;
+  
+//   // Tasks
+//   tasks: Task[];
+//   addTask: (text: string) => void;
+//   toggleTask: (id: string) => void;
+//   deleteTask: (id: string) => void;
+
+  
+// }
+
+// export const useProductivityStore = create<ProductivityState>()(
+//   persist(
+//     (set, get) => ({
+//       timerMode: 'focus',
+//       timeLeft: TIMER_PRESETS.focus,
+//       timerActive: false,
+//       tasks: [],
+      
+//       setTimerMode: (mode) => set({ 
+//         timerMode: mode, 
+//         timeLeft: TIMER_PRESETS[mode], 
+//         timerActive: false 
+
+      
+
+//       }),
+//       toggleTimer: () => set((state) => ({ timerActive: !state.timerActive })),
+//       resetTimer: () => set((state) => ({ 
+//         timeLeft: TIMER_PRESETS[state.timerMode], 
+//         timerActive: false 
+//       })),
+//       tick: () => set((state) => {
+//         if (state.timeLeft <= 0) {
+//           // Timer finished logic
+//           return { timerActive: false, timeLeft: 0 };
+//         }
+//         return { timeLeft: state.timeLeft - 1 };
+//       }),
+
+//       addTask: (text) => set((state) => ({
+//         tasks: [...state.tasks, {
+//           id: nanoid(),
+//           text,
+//           completed: false,
+//           category: 'Today',
+//           priority: 'medium',
+//           createdAt: Date.now()
+//         }]
+//       })),
+//       toggleTask: (id) => set((state) => ({
+//         tasks: state.tasks.map(t => t.id === id ? { ...t, completed: !t.completed } : t)
+//       })),
+//       deleteTask: (id) => set((state) => ({
+//         tasks: state.tasks.filter(t => t.id !== id)
+//       })),
+//     }),
+//     { name: 'productivity-storage' }
+//   )
+// );
 // --- Productivity Store ---
 interface ProductivityState {
   // Timer
@@ -151,6 +220,9 @@ interface ProductivityState {
   toggleTimer: () => void;
   resetTimer: () => void;
   tick: () => void;
+  
+  // --- NEW ACTION ADDED HERE ---
+  setTime: (seconds: number) => void; 
   
   // Tasks
   tasks: Task[];
@@ -185,6 +257,9 @@ export const useProductivityStore = create<ProductivityState>()(
         return { timeLeft: state.timeLeft - 1 };
       }),
 
+      // --- NEW IMPLEMENTATION ADDED HERE ---
+      setTime: (seconds) => set({ timeLeft: seconds }),
+
       addTask: (text) => set((state) => ({
         tasks: [...state.tasks, {
           id: nanoid(),
@@ -205,7 +280,6 @@ export const useProductivityStore = create<ProductivityState>()(
     { name: 'productivity-storage' }
   )
 );
-
 // --- Chat/Room Store (Firebase-enabled with local fallback) ---
 
 interface ChatState {

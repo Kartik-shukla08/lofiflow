@@ -1,7 +1,20 @@
 import { Playlist, Theme, Track } from './types';
 
+
 // Moved helper up to use it in the data below
+// export const extractVideoId = (url: string): string | null => {
+//   const regex = /(?:youtube\.com\/watch\?v=|youtu\.be\/|youtube\.com\/embed\/)([^&\s]+)/;
+//   const match = url.match(regex);
+//   return match ? match[1] : null;
+// };
+// --- NEW API CONSTANT ---
+// We point to '/api' so Vite intercepts it. Do not use 'https://yewtu.be...' here.
+export const API_PROVIDERS = ['/api1', '/api2', '/api3'];
+
+// Helper to extract ID (kept the same)
 export const extractVideoId = (url: string): string | null => {
+  if (!url) return null;
+  if (url.length === 11 && !url.includes('.') && !url.includes('/')) return url;
   const regex = /(?:youtube\.com\/watch\?v=|youtu\.be\/|youtube\.com\/embed\/)([^&\s]+)/;
   const match = url.match(regex);
   return match ? match[1] : null;
@@ -30,11 +43,57 @@ export const THEMES: Theme[] = [
   }
 ];
 
+// export const BACKGROUNDS = [
+//   { id: 'rain_city', type: 'video', url: 'https://assets.mixkit.co/videos/preview/mixkit-rain-falling-on-the-glass-of-a-window-51726-large.mp4', thumb: 'https://picsum.photos/id/1/200/120' },
+//   { id: 'forest', type: 'image', url: 'https://images.unsplash.com/photo-1448375240586-dfd8f3793300?q=80&w=2000&auto=format&fit=crop', thumb: 'https://picsum.photos/id/10/200/120' },
+//   { id: 'coffee', type: 'image', url: 'https://images.unsplash.com/photo-1497935586351-b67a49e012bf?q=80&w=2000&auto=format&fit=crop', thumb: 'https://picsum.photos/id/1060/200/120' },
+//   { id: 'abstract', type: 'image', url: 'https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?q=80&w=2000&auto=format&fit=crop', thumb: 'https://picsum.photos/id/108/200/120' },
+// ];
+
 export const BACKGROUNDS = [
-  { id: 'rain_city', type: 'video', url: 'https://assets.mixkit.co/videos/preview/mixkit-rain-falling-on-the-glass-of-a-window-51726-large.mp4', thumb: 'https://picsum.photos/id/1/200/120' },
-  { id: 'forest', type: 'image', url: 'https://images.unsplash.com/photo-1448375240586-dfd8f3793300?q=80&w=2000&auto=format&fit=crop', thumb: 'https://picsum.photos/id/10/200/120' },
-  { id: 'coffee', type: 'image', url: 'https://images.unsplash.com/photo-1497935586351-b67a49e012bf?q=80&w=2000&auto=format&fit=crop', thumb: 'https://picsum.photos/id/1060/200/120' },
-  { id: 'abstract', type: 'image', url: 'https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?q=80&w=2000&auto=format&fit=crop', thumb: 'https://picsum.photos/id/108/200/120' },
+
+  { 
+    id: 'none', 
+    type: 'image', 
+    url: '', 
+    // A clean "Default" text placeholder for the UI
+    thumb: 'https://placehold.co/200x120/1e293b/ffffff?text=Default' 
+  },
+  
+  { 
+    id: 'blue_sky', 
+    type: 'image', 
+    // anime style blue sky with clouds
+    url: 'https://external-content.duckduckgo.com/iu/?u=https%3A%2F%2Fwallpaperaccess.com%2Ffull%2F4162156.png&f=1&nofb=1&ipt=d3993c3ac3f4da9d767f703d7f7f7465dd4a198a18fa0dbc2cd2804d2840f367', 
+    // Matching thumbnail
+    thumb: 'https://external-content.duckduckgo.com/iu/?u=https%3A%2F%2Fwallpaperaccess.com%2Ffull%2F4162156.png&f=1&nofb=1&ipt=d3993c3ac3f4da9d767f703d7f7f7465dd4a198a18fa0dbc2cd2804d2840f367' 
+  },
+  
+  
+  { 
+    id: 'lofi_sunset', 
+    type: 'image', 
+    // orange japanese town sunset lofi art
+    url: 'https://external-content.duckduckgo.com/iu/?u=https%3A%2F%2Fwallpapers.com%2Fimages%2Fhd%2Fchill-4k-torri-gate-art-xhk7vo82flh9in1g.jpg&f=1&nofb=1&ipt=7d15e370f4d7aeeee8f412cc8f7fce29f6bfe32ba275d8db54c9e7b9d2124ff4', 
+    thumb: 'https://external-content.duckduckgo.com/iu/?u=https%3A%2F%2Fwallpapers.com%2Fimages%2Fhd%2Fchill-4k-torri-gate-art-xhk7vo82flh9in1g.jpg&f=1&nofb=1&ipt=7d15e370f4d7aeeee8f412cc8f7fce29f6bfe32ba275d8db54c9e7b9d2124ff4' 
+  },
+
+  { 
+    id: 'cozy_warm', 
+    type: 'video', 
+    // cozy warm home outdoor loop"
+    url: 'https://cdn.pixabay.com/video/2024/05/07/211089_tiny.mp4', 
+    thumb: 'https://external-content.duckduckgo.com/iu/?u=https%3A%2F%2Fwallpapercave.com%2Fwp%2Fwp15088282.webp&f=1&nofb=1&ipt=22cbdfde93b2eaf567bffd781e9aed0aea65335ccd713b70f03d05a5f2f19718' 
+  },
+  
+  
+  { 
+    id: 'lofi_cat', 
+    type: 'video', 
+    // cute lofi cat studying loop
+    url: 'https://cdn.pixabay.com/video/2024/12/11/246243_tiny.mp4', 
+    thumb: 'https://tse3.mm.bing.net/th/id/OIP.M7H_V3H86nOKfCxltXz5hAHaEK?w=600&h=337&rs=1&pid=ImgDetMain&o=7&rm=3' 
+  },
 ];
 
 // Flattened list specifically for the Music Player component
@@ -151,8 +210,7 @@ export const CURATED_PLAYLISTS: Playlist[] = [
 
 export const INITIAL_QUEUE = [
   // ... Your specific favorite tracks first
-  { title: "Snowfall", artist: "Øneheart", videoId: "LlN8MPS7KQs" },
-  { title: "After Dark", artist: "Mr.Kitty", videoId: "sVx1mJDeUjY" },
+  
   
   // ... Spread in tracks from your curated lists automatically
   ...CURATED_PLAYLISTS.flatMap(playlist => 
