@@ -1,0 +1,20 @@
+{
+  "rewrites": [
+    {
+      "source": "/api1/:path*",
+      "destination": "https://inv.nadeko.net/api/v1/:path*"
+    },
+    {
+      "source": "/api2/:path*",
+      "destination": "https://inv.vern.cc/api/v1/:path*"
+    },
+    {
+      "source": "/api3/:path*",
+      "destination": "https://invidious.nerdvpn.de/api/v1/:path*"
+    },
+    {
+      "source": "/(.*)",
+      "destination": "/index.html"
+    }
+  ]
+}
